@@ -68,5 +68,6 @@ namespace LegacyApp
             UserDataAccess.AddUser(user);
             return true;
         }
+        
     }
 }
