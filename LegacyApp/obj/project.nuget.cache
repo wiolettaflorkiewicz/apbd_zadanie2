@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "xjViNEj77fBlQ0OFf/XoT1KS2NnBsPlGiCKmlQkQbwoNyc+oiOTWjKulX1M6FIHdI97yn5JfTFi6tDpLsRWOYw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\wwflo\\Desktop\\zadanie\\LegacyApp\\LegacyApp.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\wwflo\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.1\\microsoft.netcore.app.ref.8.0.1.nupkg.sha512",
+    "C:\\Users\\wwflo\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.1\\microsoft.windowsdesktop.app.ref.8.0.1.nupkg.sha512",
+    "C:\\Users\\wwflo\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.1\\microsoft.aspnetcore.app.ref.8.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
