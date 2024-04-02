@@ -1,32 +1,41 @@
 ﻿using System;
+using LegacyApp.Interfaces;
+using LegacyApp.Validators.Users;
 
 namespace LegacyApp
 {
     public class UserService
     {
+        private readonly IClientRepository _clientRepository;
+        private readonly IUserCreditService _userCreditService;
+        private readonly IInputValidator _inputValidator;
+        public UserService() : this(new ClientRepository(), new UserCreditService(), new InputValidator())
+        {
+        }
+        public UserService(IClientRepository clientRepository, IUserCreditService userCreditService, IInputValidator inputValidator)
+        {
+            _clientRepository = clientRepository;
+            _userCreditService = userCreditService;
+            _inputValidator = inputValidator;
+        }
         public bool AddUser(string firstName, string lastName, string email, DateTime dateOfBirth, int clientId)
         {
-            if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
+            if (!_inputValidator.ValidateName(firstName) || !_inputValidator.ValidateName(lastName))
             {
                 return false;
             }
 
-            if (!email.Contains("@") && !email.Contains("."))
+            if (!_inputValidator.ValidateEmail(email))
             {
                 return false;
             }
 
-            var now = DateTime.Now;
-            int age = now.Year - dateOfBirth.Year;
-            if (now.Month < dateOfBirth.Month || (now.Month == dateOfBirth.Month && now.Day < dateOfBirth.Day)) age--;
-
-            if (age < 21)
+            if (!_inputValidator.ValidateAge(dateOfBirth))
             {
                 return false;
             }
-
-            var clientRepository = new ClientRepository();
-            var client = clientRepository.GetById(clientId);
+            
+            var client = _clientRepository.GetById(clientId);
 
             var user = new User
             {
@@ -43,12 +52,11 @@ namespace LegacyApp
             }
             else if (client.Type == "ImportantClient")
             {
-                using (var userCreditService = new UserCreditService())
-                {
-                    int creditLimit = userCreditService.GetCreditLimit(user.LastName, user.DateOfBirth);
-                    creditLimit = creditLimit * 2;
-                    user.CreditLimit = creditLimit;
-                }
+                
+                int creditLimit = _userCreditService.GetCreditLimit(user.LastName, user.DateOfBirth);
+                creditLimit = creditLimit * 2;
+                user.CreditLimit = creditLimit;
+
             }
             else
             {
