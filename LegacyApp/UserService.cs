@@ -46,29 +46,14 @@ namespace LegacyApp
                 LastName = lastName
             };
 
-            if (client.Type == "VeryImportantClient")
+            if (client == null)
             {
-                user.HasCreditLimit = false;
-            }
-            else if (client.Type == "ImportantClient")
-            {
-                
-                int creditLimit = _userCreditService.GetCreditLimit(user.LastName, user.DateOfBirth);
-                creditLimit = creditLimit * 2;
-                user.CreditLimit = creditLimit;
-
-            }
-            else
-            {
-                user.HasCreditLimit = true;
-                using (var userCreditService = new UserCreditService())
-                {
-                    int creditLimit = userCreditService.GetCreditLimit(user.LastName, user.DateOfBirth);
-                    user.CreditLimit = creditLimit;
-                }
+                throw new ArgumentException("Invalid client ID.");
             }
 
-            if (user.HasCreditLimit && user.CreditLimit < 500)
+            AssignCreditLimit(user, client.Type);
+
+            if (!CanAddUser(user))
             {
                 return false;
             }
@@ -76,6 +61,36 @@ namespace LegacyApp
             UserDataAccess.AddUser(user);
             return true;
         }
-        
+        private bool ValidateInput(string firstName, string lastName, string email, DateTime dateOfBirth)
+        {
+            return _inputValidator.ValidateName(firstName) &&
+                   _inputValidator.ValidateName(lastName) &&
+                   _inputValidator.ValidateEmail(email) &&
+                   _inputValidator.ValidateAge(dateOfBirth);
+        }
+
+        private void AssignCreditLimit(User user, string clientType)
+        {
+            switch (clientType)
+            {
+                case "VeryImportantClient":
+                    user.HasCreditLimit = false;
+                    break;
+                case "ImportantClient":
+                    int creditLimit = _userCreditService.GetCreditLimit(user.LastName, user.DateOfBirth) * 2;
+                    user.CreditLimit = creditLimit;
+                    break;
+                default:
+                    user.HasCreditLimit = true;
+                    user.CreditLimit = _userCreditService.GetCreditLimit(user.LastName, user.DateOfBirth);
+                    break;
+            }
+        }
+
+        private bool CanAddUser(User user)
+        {
+            return !user.HasCreditLimit || user.CreditLimit >= 500;
+        }
     }
 }
+
